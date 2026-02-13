@@ -1,4 +1,6 @@
-﻿namespace SignTool1
+﻿using System.Windows.Forms;
+
+namespace SignTool1
 {
     partial class SignForm
     {
@@ -64,6 +66,8 @@
             this.logtxt.Name = "logtxt";
             this.logtxt.Size = new System.Drawing.Size(595, 327);
             this.logtxt.TabIndex = 2;
+            this.logtxt.ScrollBars=ScrollBars.Both;
+            this.logtxt.WordWrap=false;
             // 
             // SignForm
             // 
