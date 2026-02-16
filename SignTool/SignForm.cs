@@ -11,57 +11,46 @@ namespace SignTool1
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
-            OpenFileDialog open = new OpenFileDialog();
+            bool isAnyErrorHappened=false,isCurrentFailed=false;
 
+            OpenFileDialog open = new OpenFileDialog();
             open.Filter = "Executables|*.exe;*.dll;*.sys";
             open.Multiselect = true;
 
-            if (open.ShowDialog() == DialogResult.OK)
-            {
-                foreach (string fileName in open.FileNames)
-                {
-                    logtxt.Text += fileName + "...";
-
-                    Application.DoEvents();
-
-                    SignTool.SignWithCert(fileName, "http://timestamp.verisign.com/scripts/timstamp.dll");
-
-                    logtxt.Text += "OK!" + Environment.NewLine;
+            if(open.ShowDialog()==DialogResult.OK) {
+                foreach(string fileName in open.FileNames) {
+                    isCurrentFailed=Program.SignSingleFile(fileName, message => logtxt.Text+=message, message => logtxt.Text+=message+Environment.NewLine);  
+                    if(isCurrentFailed) {
+                        isAnyErrorHappened=true;
+                    }
                 }
-
-                MessageBox.Show("Done!");
+                if(isAnyErrorHappened) {
+                    MessageBox.Show("Done with some errors! Please check the log for details.");
+                } else { 
+                    MessageBox.Show("All Done!");
+                }
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
+            bool isAnyErrorHappened=false;
+
             FolderBrowserDialog folderDialog;
 
             folderDialog = new FolderBrowserDialog();
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                string[] fileNames = Directory.GetFiles(folderDialog.SelectedPath, "*", SearchOption.AllDirectories);
+                isAnyErrorHappened=Program.SignFolder(folderDialog.SelectedPath, message => logtxt.Text+=message, message => logtxt.Text+=message+Environment.NewLine);
                 
-                foreach (string fileName in fileNames)
-                {
-                    if (fileName.Contains(".exe")
-                        || fileName.Contains(".dll")
-                        || fileName.Contains(".sys"))
-                    {
-                        logtxt.Text += fileName + "...";
-
-                        Application.DoEvents();
-
-                        SignTool.SignWithCert(fileName, "http://timestamp.verisign.com/scripts/timstamp.dll");
-
-                        logtxt.Text += "OK!" + Environment.NewLine;
-                    }
+                if(isAnyErrorHappened) {
+                    MessageBox.Show("Done with some errors! Please check the log for details.");
+                } else {
+                    MessageBox.Show("All Done!");
                 }
-
-                MessageBox.Show("Done!");
             }
         }
     }

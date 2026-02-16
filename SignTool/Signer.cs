@@ -7,11 +7,11 @@ using System.Windows.Forms;
 namespace SignTool1
 {
     /// <summary>
-    /// SignTool v1.1
+    /// SignTool v1.2
     /// 
     /// Signs jailbroken Windows RT 8.1 executables
     /// 
-    /// © 2015 eisbaer82
+    /// v1.0 © 2015 eisbaer82
     /// 
     /// v1.1 © 2022 starfrost:
     /// * Removed some duplicate code
@@ -19,6 +19,16 @@ namespace SignTool1
     /// * Removed annoying error prompt after EVERY file
     /// * Added proper copyright notice
     /// * Renamed main class from Form1 to SignForm
+    /// 
+    ///  v1.2 © 2026 BingtangXH:
+    /// * Added command-line support
+    /// * Updated some error handling and messages
+    /// * Added both scroll bar of the log textbox and a message box at the end to indicate if any error happened during the signing process
+    /// * Make the button more wide then the "Show Folder" can be fully displayed, and the first letter of each word is now uppercase
+    /// * The core SignSingleFile and SignFolder code are now moved to the Program class in Program.cs and packed as methods, which makes it easier to call them in both modes and also reuse the code.
+    ///   (if returns true then error happened, if false then all files are signed successfully. 
+    ///   You don't need to care about the details of the error while they will be shown in the log textbox or the console output.)
+    /// * Presented as 2026 CNY present for everyone who is interested in jailbreaking Windows RT devices, and also for myself as a souvenir of the good old days when I was still playing with my Surface RT.  Happy New Year!
     /// </summary>
     internal static class SignTool
     {
@@ -225,7 +235,9 @@ namespace SignTool1
                 int hResult = Marshal.GetHRForException(e);
 
                 // 0x80070000 seems to mean that the operation completed successfully here
-                if (hResult != -2147024896) MessageBox.Show(exception);
+                if(hResult!=-2147024896) {
+                    throw;
+                }
             }
             finally
             {
