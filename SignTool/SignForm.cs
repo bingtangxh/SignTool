@@ -4,8 +4,7 @@ using System.Reflection;
 using System.Windows.Forms;
 
 namespace SignTool1
-{
-    
+{    
     public partial class SignForm : Form
     {
         public SignForm()
@@ -17,9 +16,10 @@ namespace SignTool1
         {
             bool isAnyErrorHappened=false,isCurrentFailed=false;
 
-            OpenFileDialog open = new OpenFileDialog();
-            open.Filter = "Executables|*.exe;*.dll;*.sys";
-            open.Multiselect = true;
+            OpenFileDialog open = new OpenFileDialog {
+                Filter="Executables|*.exe;*.dll;*.sys",
+                Multiselect=true
+            };
 
             if(open.ShowDialog()==DialogResult.OK) {
                 foreach(string fileName in open.FileNames) {
@@ -29,9 +29,9 @@ namespace SignTool1
                     }
                 }
                 if(isAnyErrorHappened) {
-                    MessageBox.Show("Done with some errors! Please check the log for details.");
+                    // MessageBox.Show(this,"Done with some errors! Please check the log for details.","Oh no...",MessageBoxButtons.OK,MessageBoxIcon.Warning);
                 } else { 
-                    MessageBox.Show("All Done!");
+                    // MessageBox.Show(this,"All Done!","Congratulations!",MessageBoxButtons.OK,MessageBoxIcon.Information);
                 }
             }
         }
@@ -40,43 +40,26 @@ namespace SignTool1
         {
             bool isAnyErrorHappened=false;
 
-            FolderBrowserDialog folderDialog;
+            // Here used to be FolderBrowserDialog, but it looks ugly and not good for use
+            // Then I copied an alternative named FolderSelectDialog from http://www.lyquidity.com/devblog/?p=136 & https://www.cnblogs.com/xyz0835/p/5056464.html
+            FolderSelectDialog folderDialog;
             
-            folderDialog = new FolderBrowserDialog();
+            folderDialog = new FolderSelectDialog();
 
-            if (folderDialog.ShowDialog(this) == DialogResult.OK)
+            
+            if(
+                // (folderDialog.ShowDialog(this) == DialogResult.OK)
+                folderDialog.ShowDialog(this.Handle)
+            ) 
             {
-                isAnyErrorHappened=Program.SignFolder(folderDialog.SelectedPath, message => logtxt.Text+=message, message => logtxt.Text+=message+Environment.NewLine);
+                isAnyErrorHappened=Program.SignFolder(folderDialog.FileName, message => logtxt.Text+=message, message => logtxt.Text+=message+Environment.NewLine);
                 
                 if(isAnyErrorHappened) {
-                    MessageBox.Show("Done with some errors! Please check the log for details.");
+                    MessageBox.Show(this,"Done with some errors! Please check the log for details.","Oh no...",MessageBoxButtons.OK,MessageBoxIcon.Warning);
                 } else {
-                    MessageBox.Show("All Done!");
+                    MessageBox.Show(this,"All Done!","Congratulations!",MessageBoxButtons.OK,MessageBoxIcon.Information);
                 }
             }
-            /*
-             string folderPath="";
-            //FolderBrowserDialog folderDialog;
-
-            //folderDialog = new FolderBrowserDialog();
-            OpenFileDialog folderDialog = new OpenFileDialog();
-            folderDialog.ValidateNames=false;
-            folderDialog.CheckFileExists=false;
-            folderDialog.CheckPathExists=true;
-
-            if(folderDialog.ShowDialog()==DialogResult.OK) {
-                folderPath=Path.GetDirectoryName(folderDialog.FileName);
-                logtxt.Text+=folderPath+Environment.NewLine;
-
-                isAnyErrorHappened=Program.SignFolder(folderPath,message => logtxt.Text+=message,message => logtxt.Text+=message+Environment.NewLine);
-
-                if(isAnyErrorHappened) {
-                    MessageBox.Show("Done with some errors! Please check the log for details.");
-                } else {
-                    MessageBox.Show("All Done!");
-                }
-            } else return;
-             */
         }
     }
 }

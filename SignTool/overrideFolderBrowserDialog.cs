@@ -1,3 +1,5 @@
+// Stolen from http://www.lyquidity.com/devblog/?p=136 & https://www.cnblogs.com/xyz0835/p/5056464.html
+
 using System;
 using System.Reflection;
 using System.Windows.Forms;
@@ -9,19 +11,19 @@ using System.Windows.Forms;
 namespace SignTool1 {
     public class FolderSelectDialog {
         // Wrapped dialog
-        System.Windows.Forms.OpenFileDialog ofd = null;
+        private readonly System.Windows.Forms.OpenFileDialog ofd = null;
 
         /// <summary>
         /// Default constructor
         /// </summary>
         public FolderSelectDialog() {
-            ofd=new System.Windows.Forms.OpenFileDialog();
-
-            ofd.Filter="Folders|\n";
-            ofd.AddExtension=false;
-            ofd.CheckFileExists=false;
-            ofd.DereferenceLinks=true;
-            ofd.Multiselect=false;
+            ofd=new System.Windows.Forms.OpenFileDialog {
+                Filter="Folders|\n",
+                AddExtension=false,
+                CheckFileExists=false,
+                DereferenceLinks=true,
+                Multiselect=false
+            };
         }
 
         #region Properties
@@ -39,7 +41,7 @@ namespace SignTool1 {
         /// </summary>
         public string Title {
             get { return ofd.Title; }
-            set { ofd.Title=value==null ? "Select a folder" : value; }
+            set { ofd.Title=value??"Select a folder"; }
         }
 
         /// <summary>
@@ -94,10 +96,11 @@ namespace SignTool1 {
                     GC.KeepAlive(pfde);
                 }
             } else {
-                var fbd = new FolderBrowserDialog();
-                fbd.Description=this.Title;
-                fbd.SelectedPath=this.InitialDirectory;
-                fbd.ShowNewFolderButton=false;
+                var fbd = new FolderBrowserDialog {
+                    Description=this.Title,
+                    SelectedPath=this.InitialDirectory,
+                    ShowNewFolderButton=false
+                };
                 if(fbd.ShowDialog(new WindowWrapper(hWndOwner))!=DialogResult.OK) return false;
                 ofd.FileName=fbd.SelectedPath;
                 flag=true;
@@ -128,7 +131,7 @@ namespace SignTool1 {
             get { return _hwnd; }
         }
 
-        private IntPtr _hwnd;
+        private readonly IntPtr _hwnd;
     }
 
     /// <summary>
@@ -142,8 +145,8 @@ namespace SignTool1 {
     public class Reflector {
         #region variables
 
-        string m_ns;
-        Assembly m_asmb;
+        readonly string m_ns;
+        private readonly Assembly m_asmb;
 
         #endregion
 

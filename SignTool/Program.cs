@@ -73,7 +73,7 @@ namespace SignTool1 {
                 logNewLineAction("Done.");
             }
             catch(Exception ex) {
-                logNewLineAction("Failed. "+ex.ToString());
+                logNewLineAction("Failed. "+ex.Message);
                 return true;
             }
             return false;
@@ -87,7 +87,7 @@ namespace SignTool1 {
             }
             catch(Exception ex) {
                 logNewLineAction("Failed to get files in folder.");
-                logNewLineAction(ex.ToString());
+                logNewLineAction(ex.Message);
                 isAnyErrorHappened=true;
                 return isAnyErrorHappened;
             }

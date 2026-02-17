@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SignTool")]
-[assembly: AssemblyCopyright("Copyright © 2015-2026 eisbaer82 & starfrost & BingtangXH")]
+[assembly: AssemblyCopyright("Copyright © 2015-2026 eisbaer82, starfrost, BingtangXH")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

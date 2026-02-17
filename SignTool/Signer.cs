@@ -26,9 +26,11 @@ namespace SignTool1
     /// * Added both scroll bar of the log textbox and a message box at the end to indicate if any error happened during the signing process
     /// * Make the button more wide then the "Show Folder" can be fully displayed, and the first letter of each word is now uppercase
     /// * The core SignSingleFile and SignFolder code are now moved to the Program class in Program.cs and packed as methods, which makes it easier to call them in both modes and also reuse the code.
-    ///   (if returns true then error happened, if false then all files are signed successfully. 
+    ///   (if returns true then error happened, if false then all files are signed successfully.
     ///   You don't need to care about the details of the error while they will be shown in the log textbox or the console output.)
-    /// * Presented as 2026 CNY present for everyone who is interested in jailbreaking Windows RT devices, and also for myself as a souvenir of the good old days when I was still playing with my Surface RT.  Happy New Year!
+    /// * Change the folder pick dialog to a better one in the added overrideFolderBrowserDialog.cs
+    /// * No MessageBox will appear after signing a single file, and a MessageBox with icon will appear after signing a folder
+    /// * Presented as 2026 CNY present for everyone who is still interested in making more use of Windows RT devices. Happy New Year!
     /// </summary>
     internal static class SignTool
     {
@@ -199,9 +201,8 @@ namespace SignTool1
                 pSignatureInfo = CreateSignerSignatureInfo();
                 pProviderInfo = GetProviderInfo(cert);
 
-                SIGNER_CONTEXT signerContext;
 
-                SignCode(0x0, pSubjectInfo, pSignerCert, pSignatureInfo, pProviderInfo, out signerContext);
+                SignCode(0x0,pSubjectInfo,pSignerCert,pSignatureInfo,pProviderInfo,out SIGNER_CONTEXT signerContext);
 
                 // Only attempt to timestamp if we've got a timestampUrl.
                 if (!string.IsNullOrEmpty(timestampUrl))
