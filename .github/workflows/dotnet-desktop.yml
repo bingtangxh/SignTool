@@ -1,5 +1,8 @@
 name: Build + Sign (NET40)
 
+permissions:
+  contents: write
+  
 on:
   push:
     branches: [ "main" ]
