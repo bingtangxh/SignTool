@@ -153,9 +153,9 @@ jobs:
             $global:LASTEXITCODE = 0
           }
           
-      - name: Upload signed output folder
+      - name: Upload signed exe only
         uses: actions/upload-artifact@v4
         with:
-          name: signed-build
-          path: |
-            ${{ steps.locate.outputs.exeDir }}\**\*
+          name: signed-exe
+          path: ${{ env.finalExePath }}
+          if-no-files-found: error
