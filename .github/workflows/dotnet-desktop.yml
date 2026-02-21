@@ -100,14 +100,42 @@ jobs:
           $pfxPath = "$env:RUNNER_TEMP\codesign.pfx"
           [IO.File]::WriteAllBytes($pfxPath, $bytes)
           "pfxPath=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      
+      - name: Locate signtool.exe
+        id: signtool
+        shell: pwsh
+        run: |
+          $candidates = @(
+            "${env:ProgramFiles(x86)}\Windows Kits\10\bin",
+            "${env:ProgramFiles(x86)}\Windows Kits\11\bin"
+          ) | Where-Object { Test-Path $_ }
 
+          $signtool = $null
+          foreach ($root in $candidates) {
+            $signtool = Get-ChildItem -Path $root -Recurse -File -Filter "signtool.exe" -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match "\\x64\\signtool\.exe$" } |
+              Select-Object -First 1
+            if ($signtool) { break }
+          }
+
+          if (-not $signtool) {
+            Write-Host "signtool.exe not found under Windows Kits. Dumping common locations:"
+            Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits" -Recurse -File -Filter "signtool.exe" -ErrorAction SilentlyContinue |
+              ForEach-Object { Write-Host $_.FullName }
+            throw "signtool.exe not found"
+          }
+
+          Write-Host "signtool: $($signtool.FullName)"
+          "SIGNTOOL_PATH=$($signtool.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      
       - name: Sign EXE
         shell: pwsh
         run: |
           $exe = "$env:finalExePath"
           if (-not (Test-Path -LiteralPath $exe)) { throw "final exe not found: $exe" }
+          if (-not (Test-Path -LiteralPath $env:SIGNTOOL_PATH)) { throw "signtool not found: $env:SIGNTOOL_PATH" }
 
-          signtool sign `
+          & "$env:SIGNTOOL_PATH" sign `
             /f "$env:pfxPath" `
             /p "${{ secrets.SIGNING_PFX_PASSWORD }}" `
             /fd sha256 `
@@ -115,7 +143,7 @@ jobs:
             /td sha256 `
             "$exe"
 
-          signtool verify /pa "$exe"
+          & "$env:SIGNTOOL_PATH" verify /pa "$exe"
 
       - name: Upload signed output folder
         uses: actions/upload-artifact@v4
